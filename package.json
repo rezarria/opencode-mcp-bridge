@@ -18,6 +18,7 @@
     "build": "tsc",
     "build:bun": "bun build --target node ./src/index.ts --outdir ./dist",
     "prepublishOnly": "npm run build",
+    "test": "npm run typecheck",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
