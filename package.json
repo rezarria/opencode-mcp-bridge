@@ -1,0 +1,50 @@
+{
+  "name": "@rezarria/opencode-mcp-bridge",
+  "version": "1.0.0",
+  "description": "OpenCode plugin that bridges MCP server tools into subagents (which cannot call MCP tools directly)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:bun": "bun build --target node ./src/index.ts --outdir ./dist",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "opencode",
+    "plugin",
+    "mcp",
+    "model-context-protocol",
+    "subagent"
+  ],
+  "license": "MIT",
+  "author": "rezarria",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rezarria/opencode-mcp-bridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rezarria/opencode-mcp-bridge/issues"
+  },
+  "homepage": "https://github.com/rezarria/opencode-mcp-bridge#readme",
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
