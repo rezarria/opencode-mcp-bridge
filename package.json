@@ -1,6 +1,6 @@
 {
   "name": "@rezarria/opencode-mcp-bridge",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "OpenCode plugin that bridges MCP server tools into subagents (which cannot call MCP tools directly)",
   "type": "module",
   "main": "./dist/index.js",
@@ -11,12 +11,13 @@
     },
     "./tui": {
       "types": "./dist/tui.d.ts",
-      "import": "./src/tui.tsx"
+      "import": "./tui.tsx"
     }
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "tui.tsx"
   ],
   "scripts": {
     "build": "tsc",
