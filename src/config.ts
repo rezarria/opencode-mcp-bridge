@@ -9,6 +9,7 @@ import { existsSync, readFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 import type { MCPServerConfig } from "./types.js"
+import { resolveConfigPlaceholders } from "./env-resolver.js"
 
 /**
  * Load MCP server configurations from all reachable OpenCode config files.
@@ -38,7 +39,7 @@ export function loadConfig(directory: string): Record<string, MCPServerConfig> {
       const config = JSON.parse(content)
       if (config.mcp) {
         for (const [key, val] of Object.entries(config.mcp)) {
-          merged[key] = val as MCPServerConfig
+          merged[key] = resolveConfigPlaceholders(val as MCPServerConfig)
         }
       }
     } catch {}
