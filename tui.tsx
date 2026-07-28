@@ -1,6 +1,6 @@
 /** @jsxImportSource @opentui/solid */
 
-import { existsSync, readFileSync, writeFileSync } from "node:fs"
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 import type { TuiPluginApi, TuiPluginModule, TuiThemeCurrent } from "@opencode-ai/plugin/tui"
@@ -69,7 +69,9 @@ function loadBridgeConfig(directory: string): BridgeConfig | null {
 
 function writeBridgeConfig(directory: string, config: BridgeConfig): boolean {
   try {
-    const path = join(directory, ".opencode", "mcp-bridge.json")
+    const configDir = join(directory, ".opencode")
+    mkdirSync(configDir, { recursive: true })
+    const path = join(configDir, "mcp-bridge.json")
     writeFileSync(path, JSON.stringify(config, null, 2) + "\n", "utf-8")
     return true
   } catch {
