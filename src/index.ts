@@ -13,3 +13,4 @@ export type {
   MCPServerConfig,
   MCPClient,
 } from "./types.js"
+export type { BridgeConfig } from "./bridge-config.js"

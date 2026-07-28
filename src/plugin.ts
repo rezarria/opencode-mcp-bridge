@@ -9,10 +9,11 @@
 
 import type { Plugin } from "@opencode-ai/plugin"
 import { tool } from "@opencode-ai/plugin"
-import type { MCPClient } from "./types.js"
+import type { MCPClient, MCPServerConfig } from "./types.js"
 import { LocalMCPClient } from "./local-client.js"
 import { RemoteMCPClient } from "./remote-client.js"
 import { loadConfig } from "./config.js"
+import { loadBridgeConfig } from "./bridge-config.js"
 
 /**
  * The MCP Bridge plugin entry point.
@@ -30,12 +31,25 @@ import { loadConfig } from "./config.js"
 const mcpBridgePlugin: Plugin = async (ctx) => {
   const { directory } = ctx
   const mcpConfigs = loadConfig(directory)
+  const bridgeConfig = loadBridgeConfig(directory)
   const clients: Map<string, MCPClient> = new Map()
 
-  // Initialize clients for enabled MCP servers
-  for (const [name, cfg] of Object.entries(mcpConfigs)) {
-    if (cfg.enabled === false) continue
-    if (!cfg.type) continue
+  // Determine which servers to bridge
+  let serverEntries: [string, MCPServerConfig][]
+  if (bridgeConfig?.servers) {
+    // Explicit whitelist
+    serverEntries = bridgeConfig.servers
+      .filter((name) => mcpConfigs[name] !== undefined)
+      .map((name) => [name, mcpConfigs[name]])
+  } else {
+    // All enabled servers, minus excluded ones
+    serverEntries = Object.entries(mcpConfigs).filter(
+      ([name, cfg]) => cfg.enabled !== false && cfg.type && !bridgeConfig?.exclude?.includes(name),
+    )
+  }
+
+  // Initialize clients for selected MCP servers
+  for (const [name, cfg] of serverEntries) {
 
     try {
       const client: MCPClient =
