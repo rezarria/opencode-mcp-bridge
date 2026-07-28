@@ -4,7 +4,7 @@
  * @module
  */
 
-import type { MCPClient, MCPToolDefinition, MCPServerConfig } from "./types.js"
+import type { MCPClient, MCPServerConfig, MCPToolDefinition } from "./types.js"
 
 /**
  * Client for a remote MCP server accessed via HTTP POST.

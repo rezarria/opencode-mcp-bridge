@@ -9,11 +9,11 @@
 
 import type { Plugin } from "@opencode-ai/plugin"
 import { tool } from "@opencode-ai/plugin"
-import type { MCPClient, MCPServerConfig } from "./types.js"
+import { loadBridgeConfig } from "./bridge-config.js"
+import { loadConfig } from "./config.js"
 import { LocalMCPClient } from "./local-client.js"
 import { RemoteMCPClient } from "./remote-client.js"
-import { loadConfig } from "./config.js"
-import { loadBridgeConfig } from "./bridge-config.js"
+import type { MCPClient, MCPServerConfig } from "./types.js"
 
 /**
  * The MCP Bridge plugin entry point.
@@ -50,23 +50,16 @@ const mcpBridgePlugin: Plugin = async (ctx) => {
 
   // Initialize clients for selected MCP servers
   for (const [name, cfg] of serverEntries) {
-
     try {
       const client: MCPClient =
-        cfg.type === "local"
-          ? new LocalMCPClient(name, cfg)
-          : new RemoteMCPClient(name, cfg)
+        cfg.type === "local" ? new LocalMCPClient(name, cfg) : new RemoteMCPClient(name, cfg)
 
       // Probe connection and tool availability
       const tools = await client.listTools()
       clients.set(name, client)
-      console.log(
-        `[mcp-bridge] Connected to "${name}" — ${tools.length} tools available`,
-      )
+      console.log(`[mcp-bridge] Connected to "${name}" — ${tools.length} tools available`)
     } catch (err) {
-      console.warn(
-        `[mcp-bridge] Failed to connect to "${name}": ${(err as Error).message}`,
-      )
+      console.warn(`[mcp-bridge] Failed to connect to "${name}": ${(err as Error).message}`)
     }
   }
 
@@ -80,8 +73,7 @@ const mcpBridgePlugin: Plugin = async (ctx) => {
       for (const mcpTool of mcpTools) {
         const normalizedServerName = serverName.replace(/-/g, "_")
         const toolName = `mcp__${normalizedServerName}__${mcpTool.name}`
-        const description =
-          mcpTool.description || `MCP tool: ${serverName}.${mcpTool.name}`
+        const description = mcpTool.description || `MCP tool: ${serverName}.${mcpTool.name}`
         const inputSchema = mcpTool.inputSchema
 
         // Build Zod schema from MCP input schema
@@ -129,12 +121,9 @@ const mcpBridgePlugin: Plugin = async (ctx) => {
         toolMap[toolName] = tool({
           description: `[${serverName}] ${description}`,
           args: argsSchema as any,
-          async execute(args, context) {
+          async execute(args, _context) {
             try {
-              const result = await client.callTool(
-                mcpTool.name,
-                args as Record<string, unknown>,
-              )
+              const result = await client.callTool(mcpTool.name, args as Record<string, unknown>)
 
               // Format the result
               if (typeof result === "string") {

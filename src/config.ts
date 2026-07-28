@@ -5,7 +5,7 @@
  * @module
  */
 
-import { readFileSync, existsSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 import type { MCPServerConfig } from "./types.js"
@@ -41,10 +41,7 @@ export function loadConfig(directory: string): Record<string, MCPServerConfig> {
           merged[key] = val as MCPServerConfig
         }
       }
-    } catch {
-      // skip unreadable / invalid config files
-      continue
-    }
+    } catch {}
   }
 
   return merged

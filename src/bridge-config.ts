@@ -5,7 +5,7 @@
  * @module
  */
 
-import { readFileSync, existsSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 
 /**
@@ -40,10 +40,7 @@ export function loadBridgeConfig(directory: string): BridgeConfig | null {
       const content = readFileSync(p, "utf-8")
       const parsed = JSON.parse(content)
       if (parsed && typeof parsed === "object") return parsed as BridgeConfig
-    } catch {
-      // skip unreadable / invalid files
-      continue
-    }
+    } catch {}
   }
 
   return null

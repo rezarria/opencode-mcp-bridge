@@ -5,8 +5,8 @@
  * @module
  */
 
-import { spawn, type ChildProcess } from "node:child_process"
-import type { MCPClient, MCPToolDefinition, MCPServerConfig } from "./types.js"
+import { type ChildProcess, spawn } from "node:child_process"
+import type { MCPClient, MCPServerConfig, MCPToolDefinition } from "./types.js"
 
 /** Default timeout for JSON-RPC calls (60 seconds). */
 const DEFAULT_TIMEOUT_MS = 60_000
@@ -23,10 +23,7 @@ export class LocalMCPClient implements MCPClient {
 
   private proc: ChildProcess | null = null
   private messageId = 1
-  private pending = new Map<
-    number,
-    { resolve: (v: unknown) => void; reject: (e: Error) => void }
-  >()
+  private pending = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void }>()
   private buffer = ""
   private _connected = false
   private initPromise: Promise<void> | null = null
@@ -105,7 +102,7 @@ export class LocalMCPClient implements MCPClient {
       shell: false,
     })
 
-    this.proc.stdout!.on("data", (data: Buffer) => {
+    this.proc.stdout?.on("data", (data: Buffer) => {
       this.buffer += data.toString()
       const lines = this.buffer.split("\n")
       this.buffer = lines.pop()!
@@ -125,12 +122,9 @@ export class LocalMCPClient implements MCPClient {
       }
     })
 
-    this.proc.stderr!.on("data", (data: Buffer) => {
+    this.proc.stderr?.on("data", (data: Buffer) => {
       const text = data.toString()
-      if (
-        text.toLowerCase().includes("error") ||
-        text.toLowerCase().includes("fail")
-      ) {
+      if (text.toLowerCase().includes("error") || text.toLowerCase().includes("fail")) {
         console.warn(`[mcp-bridge:${this.name} stderr]`, text)
       }
     })
@@ -160,14 +154,11 @@ export class LocalMCPClient implements MCPClient {
 
   private sendNotification(method: string, params: unknown): void {
     if (!this.proc?.stdin?.writable) return
-    const msg = JSON.stringify({ jsonrpc: "2.0", method, params }) + "\n"
+    const msg = `${JSON.stringify({ jsonrpc: "2.0", method, params })}\n`
     this.proc.stdin.write(msg)
   }
 
-  private async jsonRpcCall(
-    method: string,
-    params: unknown,
-  ): Promise<unknown> {
+  private async jsonRpcCall(method: string, params: unknown): Promise<unknown> {
     const id = this.messageId++
     return new Promise((resolve, reject) => {
       if (!this.proc?.stdin?.writable) {
@@ -176,7 +167,7 @@ export class LocalMCPClient implements MCPClient {
       }
 
       this.pending.set(id, { resolve, reject })
-      const request = JSON.stringify({ jsonrpc: "2.0", id, method, params }) + "\n"
+      const request = `${JSON.stringify({ jsonrpc: "2.0", id, method, params })}\n`
       this.proc.stdin.write(request)
 
       const timer = setTimeout(() => {
