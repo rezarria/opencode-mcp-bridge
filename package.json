@@ -1,0 +1,65 @@
+{
+  "name": "@rezarria/opencode-mcp-bridge",
+  "version": "1.2.3",
+  "description": "OpenCode plugin that bridges MCP server tools into subagents (which cannot call MCP tools directly)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tui": {
+      "types": "./dist/tui.d.ts",
+      "import": "./tui.tsx"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "tui.tsx"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:bun": "bun build --target node ./src/index.ts --outdir ./dist",
+    "prepublishOnly": "npm run build",
+    "test": "npm run typecheck",
+    "typecheck": "tsc --noEmit",
+    "fmt": "biome format --write src/",
+    "lint": "biome lint src/",
+    "check": "biome check --write src/"
+  },
+  "keywords": [
+    "opencode",
+    "plugin",
+    "mcp",
+    "model-context-protocol",
+    "subagent"
+  ],
+  "license": "MIT",
+  "author": "rezarria",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rezarria/opencode-mcp-bridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rezarria/opencode-mcp-bridge/issues"
+  },
+  "homepage": "https://github.com/rezarria/opencode-mcp-bridge#readme",
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.14.0",
+    "@opentui/core": "^0.4.5",
+    "@opentui/solid": "^0.4.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.6",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
