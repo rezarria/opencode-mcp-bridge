@@ -554,20 +554,42 @@ gửi newline sau message, nhưng không phải tất cả. **Luôn parse Conten
 **Remote MCP servers dùng Streamable HTTP**, không phải plain HTTP POST.
 Yêu cầu:
 - `Accept: application/json, text/event-stream`
-- Session management (session ID trong response)
-- Streaming response (SSE) cho long-running operations
+- Session management (session ID trong response header)
+- MCP initialize handshake (initialize → notifications/initialized)
+- SSE response parsing (text/event-stream content type)
 
-**Plugin hiện tại không support** — mới chỉ có plain HTTP POST:
+**Plugin hiện tại đã support** — `RemoteMCPClient` thực hiện:
+
+1. **Initialize handshake:** Gửi `initialize` request (không có session ID), nhận response
+   (JSON hoặc SSE), lưu `mcp-session-id` từ response header và `protocolVersion` từ body.
+2. **Notification:** Gửi `notifications/initialized` — server trả về 202 Accepted, không parse body.
+3. **Subsequent requests:** Gửi với `mcp-session-id` và `mcp-protocol-version` headers.
+4. **SSE parsing:** Parse `text/event-stream` response, tìm event khớp với request ID.
+5. **Plain JSON fallback:** Nếu response là `application/json`, parse trực tiếp.
+
 ```typescript
-const response = await fetch(url, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(request),
-})
+// Initialize handshake (no session ID)
+POST /mcp
+Headers: { "mcp-protocol-version": "2024-11-05" }
+Body: { jsonrpc: "2.0", id: 1, method: "initialize", params: {...} }
+← 200 text/event-stream với SSE event chứa InitializeResult
+← Header: mcp-session-id: <uuid>
+
+// Notifications/initialized
+POST /mcp
+Headers: { "mcp-session-id": "<uuid>", "mcp-protocol-version": "2024-11-05" }
+Body: { jsonrpc: "2.0", method: "notifications/initialized" }
+← 202 Accepted (no body)
+
+// tools/list
+POST /mcp
+Headers: { "mcp-session-id": "<uuid>", "mcp-protocol-version": "2024-11-05" }
+Body: { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }
+← 200 text/event-stream với SSE event chứa tools list
 ```
 
-Server nào fail: `context7` (400 — missing session ID), `tavily-search` (406 —
-missing Accept header). Các server local (stdio) hoạt động tốt.
+**Đã test thành công với:** `context7` (Context7 MCP), `tavily-search` (Tavily MCP).
+Cả hai đều dùng SSE response với session management.
 
 ### 5.5 Server name normalization
 

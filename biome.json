@@ -6,7 +6,18 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "preset": "recommended"
+      "preset": "recommended",
+      "style": {
+        "noNonNullAssertion": "off",
+        "useTemplate": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noAssignInExpressions": "off"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "off"
+      }
     }
   },
   "formatter": {
@@ -22,7 +33,7 @@
     }
   },
   "files": {
-    "includes": ["src/**/*.ts", "src/**/*.tsx"],
+    "includes": ["src/**/*.ts", "src/**/*.tsx", "tui.tsx"],
     "ignoreUnknown": true
   }
 }

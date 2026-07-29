@@ -6,7 +6,7 @@
  */
 
 import { type ChildProcess, spawn } from "node:child_process"
-import type { MCPClient, MCPServerConfig, MCPToolDefinition } from "./types.js"
+import type { MCPClient, MCPServerConfig, MCPToolDefinition } from "./types"
 
 /** Default timeout for JSON-RPC calls (60 seconds). */
 const DEFAULT_TIMEOUT_MS = 60_000
@@ -96,13 +96,14 @@ export class LocalMCPClient implements MCPClient {
 
     const env = this.getEnv()
 
-    this.proc = spawn(cmd[0], cmd.slice(1), {
+    this.proc = spawn(cmd[0]!, cmd.slice(1), {
       stdio: ["pipe", "pipe", "pipe"],
       env,
       shell: false,
     })
 
-    this.proc.stdout?.on("data", (data: Buffer) => {
+    const proc = this.proc!
+    proc.stdout?.on("data", (data: Buffer) => {
       this.buffer += data.toString()
       const lines = this.buffer.split("\n")
       this.buffer = lines.pop()!
@@ -122,19 +123,19 @@ export class LocalMCPClient implements MCPClient {
       }
     })
 
-    this.proc.stderr?.on("data", (data: Buffer) => {
+    proc.stderr?.on("data", (data: Buffer) => {
       const text = data.toString()
       if (text.toLowerCase().includes("error") || text.toLowerCase().includes("fail")) {
         console.warn(`[mcp-bridge:${this.name} stderr]`, text)
       }
     })
 
-    this.proc.on("error", (err) => {
+    proc.on("error", (err) => {
       console.error(`[mcp-bridge:${this.name}] process error:`, err.message)
       this._connected = false
     })
 
-    this.proc.on("exit", (code) => {
+    proc.on("exit", (code) => {
       console.warn(`[mcp-bridge:${this.name}] process exited with code ${code}`)
       this._connected = false
     })

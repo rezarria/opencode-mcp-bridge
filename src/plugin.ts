@@ -9,11 +9,11 @@
 
 import type { Plugin } from "@opencode-ai/plugin"
 import { tool } from "@opencode-ai/plugin"
-import { loadBridgeConfig } from "./bridge-config.js"
-import { loadConfig } from "./config.js"
-import { LocalMCPClient } from "./local-client.js"
-import { RemoteMCPClient } from "./remote-client.js"
-import type { MCPClient, MCPServerConfig } from "./types.js"
+import { loadBridgeConfig } from "./bridge-config"
+import { loadConfig } from "./config"
+import { LocalMCPClient } from "./local-client"
+import { RemoteMCPClient } from "./remote-client"
+import type { MCPClient, MCPServerConfig } from "./types"
 
 /**
  * The MCP Bridge plugin entry point.
@@ -40,7 +40,7 @@ const mcpBridgePlugin: Plugin = async (ctx) => {
     // Explicit whitelist
     serverEntries = bridgeConfig.servers
       .filter((name) => mcpConfigs[name] !== undefined)
-      .map((name) => [name, mcpConfigs[name]])
+      .map((name) => [name, mcpConfigs[name]!])
   } else {
     // All enabled servers, minus excluded ones
     serverEntries = Object.entries(mcpConfigs).filter(

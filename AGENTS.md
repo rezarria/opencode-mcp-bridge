@@ -17,12 +17,11 @@ Plugin that bridges MCP server tools into OpenCode subagents.
 
 | Command | What it does |
 |---------|-------------|
-| `npm run build` | `tsc` (compiles `src/` → `dist/`) |
+| `npm run build` | `vite build` (compiles `src/` → `dist/index.js` + `.d.ts` via `vite-plugin-dts`) |
 | `npm test` / `npm run typecheck` | `tsc --noEmit` (typecheck only, no output) |
 | `npm run fmt` | `biome format --write src/` |
 | `npm run lint` | `biome lint src/` |
 | `npm run check` | `biome check --write src/` |
-| `npm run build:bun` | `bun build --target node ./src/index.ts --outdir ./dist` |
 
 ## Two plugin systems
 
@@ -51,10 +50,15 @@ Debug with: `opencode debug agent <name>` (shows tool permission map).
 - **`ctx.directory`** is the source of truth for config paths. Never use `process.cwd()`.
 - **Config merge order** (later overrides earlier): `~/.config/opencode/opencode.json` → `opencode.jsonc` → `<project>/opencode.json` → `opencode.jsonc` → `.opencode/opencode.json` → `.opencode/opencode.jsonc`.
 - **JSONC files** are parsed with `JSON.parse` — will fail on comments, trailing commas, or single quotes.
-- **Remote MCP** only supports plain HTTP POST. Servers requiring Streamable HTTP (SSE) or session IDs will fail.
+- **Remote MCP** uses Streamable HTTP (MCP spec 2025-11-25): requires initialize handshake, session management via `mcp-session-id` header, and SSE response parsing. Servers that don't support Streamable HTTP (e.g., plain HTTP POST without session management) will fail.
 - **Each MCP server runs twice** — once for OpenCode's native MCP, once for the bridge plugin. They are separate processes.
 - **Cache invalidation** after source changes: code is cached at `~/.cache/opencode/packages/@rezarria/opencode-mcp-bridge@latest/`. Delete that directory and reinstall to pick up changes.
 - **`package.json` `files`** must include `"dist"`, `"src"`, `"tui.tsx"` for the package to work after npm install.
+## Import paths
+
+- **`src/`** uses extensionless imports (`from "./types"`, not `from "./types.js"`). Vite resolves them; `tsc` with `moduleResolution: "bundler"` accepts them.
+- **Build system:** Vite (`vite build`) — compiles to a single `dist/index.js` ES module + per-file `.d.ts` declarations via `vite-plugin-dts`.
+- **`tui.tsx`** in the project root is a separate entry point consumed via `exports["./tui"]` — it's NOT compiled by Vite (OpenCode TUI loader handles TSX directly).
 
 ## Biome formatting
 

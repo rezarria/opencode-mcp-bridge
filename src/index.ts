@@ -5,11 +5,10 @@
  * @packageDocumentation
  */
 
-export type { BridgeConfig } from "./bridge-config.js"
-export { mcpBridgePlugin } from "./plugin.js"
-// Re-export key types for consumers
+export type { BridgeConfig } from "./bridge-config"
+export { mcpBridgePlugin } from "./plugin"
 export type {
   MCPClient,
   MCPServerConfig,
   MCPToolDefinition,
-} from "./types.js"
+} from "./types"

@@ -3,7 +3,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
-import type { TuiPluginApi, TuiPluginModule, TuiThemeCurrent } from "@opencode-ai/plugin/tui"
+import type { TuiPluginApi, TuiPluginModule } from "@opencode-ai/plugin/tui"
 import { TextAttributes } from "@opentui/core"
 
 // ── Types ────────────────────────────────────────────────────────────────
@@ -72,14 +72,14 @@ function writeBridgeConfig(directory: string, config: BridgeConfig): boolean {
     const configDir = join(directory, ".opencode")
     mkdirSync(configDir, { recursive: true })
     const path = join(configDir, "mcp-bridge.json")
-    writeFileSync(path, JSON.stringify(config, null, 2) + "\n", "utf-8")
+    writeFileSync(path, `${JSON.stringify(config, null, 2)}\n`, "utf-8")
     return true
   } catch {
     return false
   }
 }
 
-type Theme = TuiThemeCurrent
+// Theme type is available via TuiThemeCurrent
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -88,9 +88,7 @@ function computeBridgedServers(
   bridgeConfig: BridgeConfig | null,
 ): Set<string> {
   if (bridgeConfig?.servers) {
-    return new Set(
-      bridgeConfig.servers.filter((name) => allServers.some(([n]) => n === name)),
-    )
+    return new Set(bridgeConfig.servers.filter((name) => allServers.some(([n]) => n === name)))
   }
   return new Set(
     allServers
@@ -241,9 +239,7 @@ function renderPanel(api: TuiPluginApi, directory: string) {
                 <text fg={theme.textMuted}>({cfg.type})</text>
               </box>
               <box width={10}>
-                <text fg={statusColor}>
-                  {cfg.enabled !== false ? "enabled" : "off"}
-                </text>
+                <text fg={statusColor}>{cfg.enabled !== false ? "enabled" : "off"}</text>
               </box>
               <box
                 width={14}

@@ -3,7 +3,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
-import type { TuiPluginApi, TuiPluginModule, TuiThemeCurrent } from "@opencode-ai/plugin/tui"
+import type { TuiPluginApi, TuiPluginModule } from "@opencode-ai/plugin/tui"
 import { TextAttributes } from "@opentui/core"
 
 // ── Types ────────────────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ function writeBridgeConfig(directory: string, config: BridgeConfig): boolean {
   }
 }
 
-type Theme = TuiThemeCurrent
+// Theme type is available via TuiThemeCurrent
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 

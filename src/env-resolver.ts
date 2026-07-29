@@ -34,27 +34,29 @@ export function resolvePlaceholders(value: string): string {
   // Resolve {env:VAR} placeholders
   let envMatch: RegExpExecArray | null
   while ((envMatch = ENV_PLACEHOLDER.exec(result)) !== null) {
-    const varName = envMatch[1]
+    const varName = envMatch[1]!
     const envValue = process.env[varName]
     if (envValue === undefined) {
       throw new Error(
         `Environment variable "${varName}" is not set (referenced by "{env:${varName}}")`,
       )
     }
-    result = result.slice(0, envMatch.index) + envValue + result.slice(envMatch.index + envMatch[0].length)
+    result =
+      result.slice(0, envMatch.index) + envValue + result.slice(envMatch.index + envMatch[0].length)
   }
 
   // Resolve {file:path} placeholders
   let fileMatch: RegExpExecArray | null
   while ((fileMatch = FILE_PLACEHOLDER.exec(result)) !== null) {
-    const filePath = fileMatch[1]
+    const filePath = fileMatch[1]!
     if (!existsSync(filePath)) {
-      throw new Error(
-        `File not found: "${filePath}" (referenced by "{file:${filePath}}")`,
-      )
+      throw new Error(`File not found: "${filePath}" (referenced by "{file:${filePath}}")`)
     }
     const fileContent = readFileSync(filePath, "utf-8").trim()
-    result = result.slice(0, fileMatch.index) + fileContent + result.slice(fileMatch.index + fileMatch[0].length)
+    result =
+      result.slice(0, fileMatch.index) +
+      fileContent +
+      result.slice(fileMatch.index + fileMatch[0].length)
   }
 
   return result

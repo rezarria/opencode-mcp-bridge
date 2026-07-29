@@ -8,8 +8,8 @@
 import { existsSync, readFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
-import type { MCPServerConfig } from "./types.js"
-import { resolveConfigPlaceholders } from "./env-resolver.js"
+import { resolveConfigPlaceholders } from "./env-resolver"
+import type { MCPServerConfig } from "./types"
 
 /**
  * Load MCP server configurations from all reachable OpenCode config files.
