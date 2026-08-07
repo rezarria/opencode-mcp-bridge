@@ -9,6 +9,7 @@
 
 import type { Plugin } from "@opencode-ai/plugin"
 import { tool } from "@opencode-ai/plugin"
+import pkg from "../package.json" with { type: "json" }
 import { loadBridgeConfig } from "./bridge-config"
 import { loadConfig } from "./config"
 import { LocalMCPClient } from "./local-client"
@@ -30,6 +31,7 @@ import type { MCPClient, MCPServerConfig } from "./types"
  */
 const mcpBridgePlugin: Plugin = async (ctx) => {
   const { directory } = ctx
+  console.log(`[mcp-bridge] v${pkg.version}`)
   const mcpConfigs = loadConfig(directory)
   const bridgeConfig = loadBridgeConfig(directory)
   const clients: Map<string, MCPClient> = new Map()

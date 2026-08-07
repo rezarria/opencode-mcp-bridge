@@ -1,6 +1,6 @@
 {
   "name": "@rezarria/opencode-mcp-bridge",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "OpenCode plugin that bridges MCP server tools into subagents (which cannot call MCP tools directly)",
   "type": "module",
   "main": "./dist/index.js",
